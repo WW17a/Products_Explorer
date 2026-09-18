@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
         if (!storedUser || storedUser === "undefined") {
             return null;
         }
-
+           
         try {
             return JSON.parse(storedUser);
         } catch {
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
         <AuthContext.Provider
             value={{
                 user,
-                isAuthenticated: !!user,
+                isAuthenticated: user ? true : false,
                 login,
                 signup,
                 logout,
