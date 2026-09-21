@@ -1,20 +1,30 @@
-import { createContext, useContext, useState } from "react";
-import { loginUser, signupUser } from "../services/authApi";
+
+import {
+    createContext,
+    useContext,
+    useState
+} from "react";
+
+import {
+    loginUser,
+    signupUser
+} from "../services/authApi";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+
     const [user, setUser] = useState(() => {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = sessionStorage.getItem("user");
 
         if (!storedUser || storedUser === "undefined") {
             return null;
         }
-           
+
         try {
             return JSON.parse(storedUser);
         } catch {
-            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
             return null;
         }
     });
@@ -22,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         const data = await loginUser(credentials);
 
-        localStorage.setItem(
+        sessionStorage.setItem(
             "user",
             JSON.stringify(data.user)
         );
@@ -35,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     const signup = async (userData) => {
         const data = await signupUser(userData);
 
-        localStorage.setItem(
+        sessionStorage.setItem(
             "user",
             JSON.stringify(data.user)
         );
@@ -46,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
         setUser(null);
     };
 
@@ -68,3 +78,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
     return useContext(AuthContext);
 };
+

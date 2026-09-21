@@ -2,7 +2,7 @@ import { memo } from "react";
 
 const ProductCard = memo(({ product ,onSelect}) => {
   return (
-    <div className="w-full sm:w-[45%] lg:w-[30%] xl:w-[23%] rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="w-full sm:w-[45%] lg:w-[30%] xl:w-[23%] rounded-lg border border-blue-300 bg-gray-100 p-4 shadow-sm">
       <img
         src={product.thumbnail}
         alt={product.title}
