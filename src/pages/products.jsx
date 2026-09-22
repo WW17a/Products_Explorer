@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { getProducts } from "../services/productApi";
+import { useLocation } from "react-router-dom";
+import { createProduct, getProducts, updateProduct } from "../services/productApi";
+
 import ProductList from "../components/products/ProductList";
 import ProductModal from "../components/products/ProductModel";
-import useProductFilters from "../hooks/useProductFilters";
-import usePagination from "../hooks/usePagination";
-import Pagination from "../components/pagination/Pagination";
+import ProductForm from "../components/products/ProductForm";
 import ProductSkeletonList from "../components/products/ProductSkeletonList";
 import ProductToolbar from "../components/products/ProductToolBar";
-import Navbar from "../components/layout/Navbar";
 
+import Pagination from "../components/pagination/Pagination";
+
+import useProductFilters from "../hooks/useProductFilters";
+import usePagination from "../hooks/usePagination";
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -20,6 +23,12 @@ const Products = () => {
     const [sort, setSort] = useState("");
 
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [editingProduct, setEditingProduct] = useState(null);
+
+    const [isProductFormOpen, setIsProductFormOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const location = useLocation();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -40,21 +49,92 @@ const Products = () => {
         fetchProducts();
     }, []);
 
+    useEffect(() => {
+        setCategory(location.state?.category || "");
+    }, [location.state?.category]);
+
     const handleSelect = useCallback((product) => {
         setSelectedProduct(product);
     }, []);
 
-    const categories = [...new Set(products.map((product) => product.category)),];
-    const visibleProducts = useProductFilters(products, search, category, sort);
+    const handleEditProduct = useCallback((product) => {
+        setEditingProduct(product);
+    }, []);
 
-    const { currentItems, currentPage, totalPages, goToPage, nextPage, previousPage, } = usePagination(visibleProducts, 8);
+    const handleAddProduct = async (productData) => {
+        try {
+            setIsSubmitting(true);
+            setError(null);
+
+            const newProduct = await createProduct(productData);
+
+            setProducts((currentProducts) => [
+                newProduct,
+                ...currentProducts,
+            ]);
+
+            setIsProductFormOpen(false);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+
+
+    const handleUpdateProduct = async (productData) => {
+        try {
+            setIsSubmitting(true);
+
+            const updatedProduct = await updateProduct(
+                editingProduct.id,
+                productData
+            );
+
+            setProducts((currentProducts) =>
+                currentProducts.map((product) =>
+                    product.id === updatedProduct.id
+                        ? updatedProduct
+                        : product
+                )
+            );
+
+            setEditingProduct(null);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+
+    const categories = [
+        ...new Set(products.map((product) => product.category)),
+    ];
+
+    const visibleProducts = useProductFilters(
+        products,
+        search,
+        category,
+        sort
+    );
+
+    const {
+        currentItems,
+        currentPage,
+        totalPages,
+        goToPage,
+        nextPage,
+        previousPage,
+    } = usePagination(visibleProducts, 8);
 
     if (isLoading) {
         return <ProductSkeletonList />;
     }
 
     if (error) {
-        return <p>Failed to load products : {error}</p>;
+        return <p>Failed to load products: {error}</p>;
     }
 
     if (products.length === 0) {
@@ -62,8 +142,6 @@ const Products = () => {
     }
 
     return (
-      <>
-      <Navbar />
         <main className="mx-auto max-w-9xl px-2 py-5 sm:px-6 lg:px-8">
             <ProductToolbar
                 search={search}
@@ -71,16 +149,25 @@ const Products = () => {
                 category={category}
                 onCategoryChange={setCategory}
                 sort={sort}
-                onSortChange={setSort} 
+                onSortChange={setSort}
                 categories={categories}
-                />
+                onAddProduct={() => setIsProductFormOpen(true)}
+            />
 
             <ProductList
                 products={currentItems}
                 onSelect={handleSelect}
+                onEdit={handleEditProduct}
+
             />
 
-            <Pagination currentPage={currentPage} totalPages={totalPages} onNext={nextPage} onPrevious={previousPage} onPageChange={goToPage} />
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onNext={nextPage}
+                onPrevious={previousPage}
+                onPageChange={goToPage}
+            />
 
             {selectedProduct && (
                 <ProductModal
@@ -88,8 +175,25 @@ const Products = () => {
                     onClose={() => setSelectedProduct(null)}
                 />
             )}
+
+            {isProductFormOpen && (
+                <ProductForm
+                    onSubmit={handleAddProduct}
+                    onClose={() => setIsProductFormOpen(false)}
+                    isSubmitting={isSubmitting}
+                />
+            )}
+
+            {editingProduct && (
+                <ProductForm
+                    product={editingProduct}
+                    onSubmit={handleUpdateProduct}
+                    onClose={() => setEditingProduct(null)}
+                    isSubmitting={isSubmitting}
+                />
+            )}
+
         </main>
-        </>
     );
 };
 

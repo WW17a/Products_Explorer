@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import CategoryMenu from "./Categorymenu";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,21 +18,27 @@ const Navbar = () => {
     const initial = user?.name?.charAt(0).toUpperCase();
 
     return (
-        <header className="bg-[#172554] text-white shadow-lg">
+        <header className="sticky top-0 z-50 bg-[#172554] text-white shadow-lg">
             <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 
-
+               
                 <Link to="/products" className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 font-bold text-[#172554]">
                         P
                     </div>
 
                     <div>
-                        <h1 className="text-lg font-bold">    Product Explorer </h1>
-                        <p className="text-xs text-blue-200">  Discover something new </p>
+                        <h1 className="text-lg font-bold">
+                            Product Explorer
+                        </h1>
+
+                        <p className="text-xs text-blue-200">
+                            Discover something new
+                        </p>
                     </div>
                 </Link>
 
+               
                 <div className="hidden items-center gap-2 md:flex">
                     <Link
                         to="/products"
@@ -40,7 +47,7 @@ const Navbar = () => {
                         Products
                     </Link>
 
-                    <button className="rounded-lg px-4 py-2 text-sm text-blue-100 transition hover:bg-white/10 hover:text-white">   Categories </button>
+                    <CategoryMenu />
 
                     <Link
                         to="/about"
@@ -51,7 +58,7 @@ const Navbar = () => {
 
                     <div className="mx-3 h-8 w-px bg-blue-300/20" />
 
-
+                   
                     <div className="flex items-center gap-2">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-400 font-bold text-[#172554]">
                             {initial}
@@ -70,27 +77,34 @@ const Navbar = () => {
                     </button>
                 </div>
 
-
+               
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xl md:hidden"
                     aria-label="Toggle menu"
+                    aria-expanded={isMenuOpen}
                 >
                     {isMenuOpen ? "✕" : "☰"}
                 </button>
             </nav>
 
+           
             {isMenuOpen && (
                 <div className="border-t border-white/10 bg-[#0f172a] px-4 py-4 md:hidden">
+
+                   
                     <div className="mb-4 flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 font-bold text-[#172554]">
                             {initial}
                         </div>
 
-                        <span className="font-medium">{user?.name}</span>
+                        <span className="font-medium">
+                            {user?.name}
+                        </span>
                     </div>
 
                     <div className="flex flex-col gap-1">
+
                         <Link
                             to="/products"
                             onClick={() => setIsMenuOpen(false)}
@@ -99,9 +113,7 @@ const Navbar = () => {
                             Products
                         </Link>
 
-                        <button className="rounded-lg px-4 py-3 text-left text-blue-100 hover:bg-white/10">
-                            Categories
-                        </button>
+                        <CategoryMenu />
 
                         <Link
                             to="/about"
@@ -117,6 +129,7 @@ const Navbar = () => {
                         >
                             Logout
                         </button>
+
                     </div>
                 </div>
             )}
@@ -124,4 +137,4 @@ const Navbar = () => {
     );
 };
 
-export default Navbar;  
+export default Navbar;

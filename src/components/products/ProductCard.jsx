@@ -1,14 +1,25 @@
+import { Pencil } from "lucide-react";
 import { memo } from "react";
 
-const ProductCard = memo(({ product ,onSelect}) => {
+const ProductCard = memo(({ product, onSelect, onEdit }) => {
   return (
-    <div className="w-full sm:w-[45%] lg:w-[30%] xl:w-[23%] rounded-lg border border-blue-300 bg-gray-100 p-4 shadow-sm">
+    <div className="relative w-full rounded-lg border border-blue-300 bg-gray-100 p-4 shadow-sm sm:w-[45%] lg:w-[30%] xl:w-[23%]">
+
+      <button
+        type="button"
+        onClick={() => onEdit(product)}
+        aria-label={`Edit ${product.title}`}
+        className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+      >
+        <Pencil size={17} />
+      </button>
+
       <img
         src={product.thumbnail}
         alt={product.title}
         className="h-48 w-full rounded-md object-cover"
       />
-       
+
       <h2 className="mt-3 text-lg font-semibold">
         {product.title}
       </h2>
@@ -29,7 +40,10 @@ const ProductCard = memo(({ product ,onSelect}) => {
         Category: {product.category}
       </p>
 
-      <button onClick={()=>onSelect(product)} className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-green-700">
+      <button
+        onClick={() => onSelect(product)}
+        className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-green-700"
+      >
         View Details
       </button>
     </div>

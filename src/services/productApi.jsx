@@ -1,13 +1,50 @@
 const API_URL = "https://dummyjson.com/products";
 
+
 export const getProducts = async () => {
- const response = await fetch(API_URL);
+  const response = await fetch(API_URL);
 
-if (!response.ok) {
-  throw new Error("Failed to fetch products");
-}
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
 
-const data = await response.json();
+  const data = await response.json();
 
-return data.products;
+  return data.products;
+};
+
+export const createProduct = async (productData) => {
+    const response = await fetch("https://dummyjson.com/products/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to create product");
+    }
+
+    return response.json();
+};
+
+
+export const updateProduct = async (productId, productData) => {
+    const response = await fetch(
+        `https://dummyjson.com/products/${productId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(productData),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to update product");
+    }
+
+    return response.json();
 };
