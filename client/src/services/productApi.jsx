@@ -1,4 +1,4 @@
-const API_URL = "https://dummyjson.com/products";
+const API_URL = "http://localhost:5000/api/products";
 
 export const getProducts = async (search = "",category = "",sort = "") => {
     let url = API_URL;

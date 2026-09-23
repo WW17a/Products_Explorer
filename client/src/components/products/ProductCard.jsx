@@ -24,7 +24,7 @@ const ProductCard = memo(({ product, onSelect, onEdit, onDelete }) => {
       </button>
 
       <img
-        src={product.thumbnail}
+        src={product.image.url}
         alt={product.title}
         className="h-48 w-full rounded-md object-cover"
       />
