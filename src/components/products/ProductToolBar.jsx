@@ -1,3 +1,7 @@
+import { PRODUCT_SORT_OPTIONS } from "../../constants/productSort";
+
+
+
 const ProductToolbar = ({
     search,
     onSearchChange,
@@ -40,21 +44,15 @@ const ProductToolbar = ({
                 <select
                     value={sort}
                     onChange={(e) => onSortChange(e.target.value)}
-                    className="min-w-0 flex-1 rounded-lg border border-gray-500 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 lg:w-52 lg:flex-none"
+                    className="..."
                 >
                     <option value="">Sort By</option>
-                    <option value="price-asc">
-                        Price: Low → High
-                    </option>
-                    <option value="price-desc">
-                        Price: High → Low
-                    </option>
-                    <option value="rating-desc">
-                        Rating: High → Low
-                    </option>
-                    <option value="name-asc">
-                        Name: A → Z
-                    </option>
+
+                    {PRODUCT_SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
                 </select>
 
 

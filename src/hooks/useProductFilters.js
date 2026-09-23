@@ -1,20 +1,14 @@
 import { useMemo } from "react";
 
-const useProductFilters = (products,search,category, sort) => {
+const useProductFilters = (products, category, sort) => {
     return useMemo(() => {
-        const searchValue = search.trim().toLowerCase();
+        let filteredProducts = products;
 
-        const filteredProducts = products.filter((product) => {
-            const matchesSearch =
-                !searchValue ||
-                product.title.toLowerCase().includes(searchValue);
-
-            const matchesCategory =
-                !category ||
-                product.category === category;
-
-            return matchesSearch && matchesCategory;
-        });
+        if (category) {
+            filteredProducts = filteredProducts.filter(
+                (product) => product.category === category
+            );
+        }
 
         if (!sort) {
             return filteredProducts;
@@ -24,21 +18,15 @@ const useProductFilters = (products,search,category, sort) => {
 
         switch (sort) {
             case "price-asc":
-                sortedProducts.sort(
-                    (a, b) => a.price - b.price
-                );
+                sortedProducts.sort((a, b) => a.price - b.price);
                 break;
 
             case "price-desc":
-                sortedProducts.sort(
-                    (a, b) => b.price - a.price
-                );
+                sortedProducts.sort((a, b) => b.price - a.price);
                 break;
 
             case "rating-desc":
-                sortedProducts.sort(
-                    (a, b) => b.rating - a.rating
-                );
+                sortedProducts.sort((a, b) => b.rating - a.rating);
                 break;
 
             case "name-asc":
@@ -52,7 +40,7 @@ const useProductFilters = (products,search,category, sort) => {
         }
 
         return sortedProducts;
-    }, [products, search, category, sort]);
+    }, [products, category, sort]);
 };
 
 export default useProductFilters;

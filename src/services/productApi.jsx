@@ -1,16 +1,31 @@
 const API_URL = "https://dummyjson.com/products";
 
+export const getProducts = async (search = "",category = "",sort = "") => {
+    let url = API_URL;
 
-export const getProducts = async () => {
-  const response = await fetch(API_URL);
+    if (category) {
+        url = `${API_URL}/category/${encodeURIComponent(category)}`;
+    } else if (search) {
+        url = `${API_URL}/search?q=${encodeURIComponent(search)}`;
+    }
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
-  }
+    if (sort) {
+        const [sortBy, order] = sort.split("-");
 
-  const data = await response.json();
+        const separator = url.includes("?") ? "&" : "?";
 
-  return data.products;
+        url += `${separator}sortBy=${sortBy}&order=${order}`;
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch products");
+    }
+
+    const data = await response.json();
+
+    return data.products;
 };
 
 export const createProduct = async (productData) => {

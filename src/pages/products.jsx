@@ -12,6 +12,9 @@ import Pagination from "../components/pagination/Pagination";
 
 import useProductFilters from "../hooks/useProductFilters";
 import usePagination from "../hooks/usePagination";
+import ConfirmDialog from "../components/common/confirmDialog";
+import useDebounce from "../hooks/useDebounce";
+import { CATEGORIES } from "../constants/categories";
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -19,11 +22,13 @@ const Products = () => {
     const [error, setError] = useState(null);
 
     const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 400);
     const [category, setCategory] = useState("");
     const [sort, setSort] = useState("");
 
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [deletingProduct, setDeletingProduct] = useState(null);
 
     const [isProductFormOpen, setIsProductFormOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +41,7 @@ const Products = () => {
                 setIsLoading(true);
                 setError(null);
 
-                const data = await getProducts();
+                const data = await getProducts(debouncedSearch,category,sort);
 
                 setProducts(data);
             } catch (error) {
@@ -47,7 +52,8 @@ const Products = () => {
         };
 
         fetchProducts();
-    }, []);
+    }, [debouncedSearch , category ,sort]);
+
 
     useEffect(() => {
         setCategory(location.state?.category || "");
@@ -109,13 +115,30 @@ const Products = () => {
     };
 
 
-    const categories = [
-        ...new Set(products.map((product) => product.category)),
-    ];
+    const handleDeleteProduct = (product) => {
+        setDeletingProduct(product);
+    };
+
+
+    const confirmDeleteProduct = () => {
+        setProducts((currentProducts) =>
+            currentProducts.filter(
+                (product) => product.id !== deletingProduct.id
+            )
+        );
+
+        setDeletingProduct(null);
+    };
+
+    const cancelDeleteProduct = () => {
+        setDeletingProduct(null);
+    };
+
+
+    
 
     const visibleProducts = useProductFilters(
         products,
-        search,
         category,
         sort
     );
@@ -150,7 +173,7 @@ const Products = () => {
                 onCategoryChange={setCategory}
                 sort={sort}
                 onSortChange={setSort}
-                categories={categories}
+                categories={CATEGORIES}
                 onAddProduct={() => setIsProductFormOpen(true)}
             />
 
@@ -158,6 +181,7 @@ const Products = () => {
                 products={currentItems}
                 onSelect={handleSelect}
                 onEdit={handleEditProduct}
+                onDelete={handleDeleteProduct}
 
             />
 
@@ -192,6 +216,14 @@ const Products = () => {
                     isSubmitting={isSubmitting}
                 />
             )}
+
+            <ConfirmDialog
+                isOpen={Boolean(deletingProduct)}
+                title="Delete product?"
+                message={`Are you sure you want to delete "${deletingProduct?.title}"? This action cannot be undone.`}
+                onConfirm={confirmDeleteProduct}
+                onCancel={cancelDeleteProduct}
+            />
 
         </main>
     );
