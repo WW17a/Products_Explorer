@@ -44,7 +44,7 @@ const ProductToolbar = ({
                 <select
                     value={sort}
                     onChange={(e) => onSortChange(e.target.value)}
-                    className="..."
+                    className="min-w-0 flex-1 rounded-lg border border-gray-500 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 lg:w-52 lg:flex-none"
                 >
                     <option value="">Sort By</option>
 

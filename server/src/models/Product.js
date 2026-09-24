@@ -31,6 +31,19 @@ const productSchema = new mongoose.Schema(
             min: 0,
         },
 
+        rating: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: 5,
+        },
+
+        stock: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+
         image: {
             url: {
                 type: String,

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { createProduct, getProducts, updateProduct } from "../services/productApi";
-
+import { createProduct, deleteProduct, getProducts, updateProduct } from "../services/productApi";
+import { toast } from 'sonner'
 import ProductList from "../components/products/ProductList";
 import ProductModal from "../components/products/ProductModel";
 import ProductForm from "../components/products/ProductForm";
@@ -9,9 +9,6 @@ import ProductSkeletonList from "../components/products/ProductSkeletonList";
 import ProductToolbar from "../components/products/ProductToolBar";
 
 import Pagination from "../components/pagination/Pagination";
-
-import useProductFilters from "../hooks/useProductFilters";
-import usePagination from "../hooks/usePagination";
 import ConfirmDialog from "../components/common/confirmDialog";
 import useDebounce from "../hooks/useDebounce";
 import { CATEGORIES } from "../constants/categories";
@@ -22,9 +19,12 @@ const Products = () => {
     const [error, setError] = useState(null);
 
     const [search, setSearch] = useState("");
-    const debouncedSearch = useDebounce(search, 400);
+    const debouncedSearch = useDebounce(search, 500);
     const [category, setCategory] = useState("");
     const [sort, setSort] = useState("");
+    const [page, setPage] = useState(1);
+
+    const [pagination, setPagination] = useState({ currentPage: 1,totalPages: 1,totalProducts: 0,limit: 8,});
 
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -40,24 +40,25 @@ const Products = () => {
             try {
                 setIsLoading(true);
                 setError(null);
-
-                const data = await getProducts(debouncedSearch,category,sort);
-
-                setProducts(data);
+                const data = await getProducts({ search: debouncedSearch, category, sort, page, limit: 8, });
+                setProducts(data.products);
+                setPagination(data.pagination);
             } catch (error) {
                 setError(error.message);
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchProducts();
-    }, [debouncedSearch , category ,sort]);
-
+    }, [debouncedSearch, category, sort, page]);
 
     useEffect(() => {
         setCategory(location.state?.category || "");
     }, [location.state?.category]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch, category, sort]);
 
     const handleSelect = useCallback((product) => {
         setSelectedProduct(product);
@@ -71,44 +72,45 @@ const Products = () => {
         try {
             setIsSubmitting(true);
             setError(null);
-
-            const newProduct = await createProduct(productData);
-
+            const result = await createProduct(productData);
             setProducts((currentProducts) => [
-                newProduct,
+                result.product,
                 ...currentProducts,
             ]);
-
             setIsProductFormOpen(false);
+            toast.success(result.message || "Product added successfully");
         } catch (error) {
-            setError(error.message);
+            toast.error(error.message || "Failed to add product");
         } finally {
             setIsSubmitting(false);
         }
     };
 
 
-
     const handleUpdateProduct = async (productData) => {
         try {
             setIsSubmitting(true);
+            setError(null);
 
-            const updatedProduct = await updateProduct(
-                editingProduct.id,
+            const result = await updateProduct(
+                editingProduct._id,
                 productData
             );
 
             setProducts((currentProducts) =>
                 currentProducts.map((product) =>
-                    product.id === updatedProduct.id
-                        ? updatedProduct
-                        : product
-                )
+                    product._id === result.product._id ? result.product : product)
             );
 
             setEditingProduct(null);
+
+            toast.success(
+                result.message || "Product updated successfully"
+            );
         } catch (error) {
-            console.error(error);
+            toast.error(
+                error.message || "Failed to update product"
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -120,37 +122,27 @@ const Products = () => {
     };
 
 
-    const confirmDeleteProduct = () => {
-        setProducts((currentProducts) =>
-            currentProducts.filter(
-                (product) => product.id !== deletingProduct.id
-            )
-        );
-
-        setDeletingProduct(null);
+    const confirmDeleteProduct = async () => {
+        try {
+            setIsSubmitting(true);
+            const result = await deleteProduct(deletingProduct._id);
+            setProducts((currentProducts) =>
+                currentProducts.filter(
+                    (product) => product._id !== deletingProduct._id
+                )
+            );
+            setDeletingProduct(null);
+            toast.success(result.message || "Product deleted successfully");
+        } catch (error) {
+            toast.error(error.message || "Failed to delete product");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
-
     const cancelDeleteProduct = () => {
         setDeletingProduct(null);
     };
 
-
-    
-
-    const visibleProducts = useProductFilters(
-        products,
-        category,
-        sort
-    );
-
-    const {
-        currentItems,
-        currentPage,
-        totalPages,
-        goToPage,
-        nextPage,
-        previousPage,
-    } = usePagination(visibleProducts, 8);
 
     if (isLoading) {
         return <ProductSkeletonList />;
@@ -160,9 +152,6 @@ const Products = () => {
         return <p>Failed to load products: {error}</p>;
     }
 
-    if (products.length === 0) {
-        return <p>No products found.</p>;
-    }
 
     return (
         <main className="mx-auto max-w-9xl px-2 py-5 sm:px-6 lg:px-8">
@@ -177,20 +166,32 @@ const Products = () => {
                 onAddProduct={() => setIsProductFormOpen(true)}
             />
 
-            <ProductList
-                products={currentItems}
-                onSelect={handleSelect}
-                onEdit={handleEditProduct}
-                onDelete={handleDeleteProduct}
-
-            />
+            {products.length > 0 ? (
+                <ProductList
+                    products={products}
+                    onSelect={handleSelect}
+                    onEdit={handleEditProduct}
+                    onDelete={handleDeleteProduct}
+                />
+            ) : (
+                <div className="py-16 text-center">
+                    <p className="text-lg font-semibold text-gray-700">
+                        No products found
+                    </p>
+                    {search && (
+                        <p className="mt-2 text-sm text-gray-500">
+                            No products match "{search}".
+                        </p>
+                    )}
+                </div>
+            )}
 
             <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onNext={nextPage}
-                onPrevious={previousPage}
-                onPageChange={goToPage}
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onNext={() => setPage((currentPage) => currentPage + 1)}
+                onPrevious={() => setPage((currentPage) => currentPage - 1)}
+                onPageChange={setPage}
             />
 
             {selectedProduct && (
@@ -223,6 +224,7 @@ const Products = () => {
                 message={`Are you sure you want to delete "${deletingProduct?.title}"? This action cannot be undone.`}
                 onConfirm={confirmDeleteProduct}
                 onCancel={cancelDeleteProduct}
+                isSubmitting={isSubmitting}
             />
 
         </main>

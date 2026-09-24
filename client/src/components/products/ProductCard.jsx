@@ -3,13 +3,13 @@ import { memo } from "react";
 
 const ProductCard = memo(({ product, onSelect, onEdit, onDelete }) => {
   return (
-    <div className="relative w-full rounded-lg border border-blue-300 bg-gray-100 p-4 shadow-sm sm:w-[45%] lg:w-[30%] xl:w-[23%]">
+    <div className="relative flex flex-col w-full rounded-lg border border-blue-300 bg-gray-200 p-4 shadow-sm sm:w-[45%] lg:w-[30%] xl:w-[23%]">
 
       <button
         type="button"
         onClick={() => onEdit(product)}
         aria-label={`Edit ${product.title}`}
-        className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
       >
         <Pencil size={17} />
       </button>
@@ -29,7 +29,7 @@ const ProductCard = memo(({ product, onSelect, onEdit, onDelete }) => {
         className="h-48 w-full rounded-md object-cover"
       />
 
-      <h2 className="mt-3 text-lg font-semibold">
+      <h2 className="mt-3 truncate text-lg font-semibold">
         {product.title}
       </h2>
 
@@ -51,7 +51,7 @@ const ProductCard = memo(({ product, onSelect, onEdit, onDelete }) => {
 
       <button
         onClick={() => onSelect(product)}
-        className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-green-700"
+        className="mt-3 w-full rounded-md bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
       >
         View Details
       </button>

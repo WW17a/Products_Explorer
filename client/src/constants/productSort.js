@@ -12,7 +12,7 @@ export const PRODUCT_SORT_OPTIONS = [
         label: "Rating: High to Low",
     },
     {
-        value: "name-asc",
+        value: "title-asc",
         label: "Name: A-Z",
     },
 ];

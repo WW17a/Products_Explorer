@@ -25,3 +25,13 @@ export const uploadImage = (fileBuffer, folder) => {
         Readable.from(fileBuffer).pipe(uploadStream);
     });
 };
+
+export const deleteImage = async (publicId) => {
+    const result = await cloudinary.uploader.destroy(publicId);
+
+    if (result.result !== "ok" && result.result !== "not found") {
+        throw new AppError("Failed to delete product image", 500);
+    }
+
+    return result;
+};

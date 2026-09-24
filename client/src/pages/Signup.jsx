@@ -5,9 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
     const navigate = useNavigate();
-        const { signup } = useAuth();
-
- 
+    const { signup } = useAuth();
     const [serverError, setServerError] = useState("");
 
     const handleSignup = async (values, { setSubmitting }) => {
@@ -19,12 +17,9 @@ const Signup = () => {
                 email: values.email,
                 password: values.password,
             });
-
             navigate("/login");
         } catch (error) {
-            setServerError(
-                error.response?.data?.message || "Signup failed"
-            );
+            setServerError(  error.response?.data?.message || "Signup failed");
         } finally {
             setSubmitting(false);
         }

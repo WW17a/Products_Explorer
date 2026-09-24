@@ -7,7 +7,7 @@ const ProductList = ({onDelete , products, onSelect, onEdit }) => {
 
       {products.map((product) => (
         <ProductCard
-          key={product.id}
+          key={product._id}
           product={product}
           onSelect={onSelect}
           onEdit={onEdit}

@@ -5,8 +5,14 @@ const logger = winston.createLogger({
 
     format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.printf(({ timestamp, level, message }) => {
-            return `${timestamp} ${level.toUpperCase()} ${message}`;
+        winston.format.errors({ stack: true }),
+
+        winston.format.printf((info) => {
+            if (info.stack) {
+                return `${info.timestamp} ${info.level.toUpperCase()}\n${info.stack}`;
+            }
+
+            return `${info.timestamp} ${info.level.toUpperCase()} ${info.message}`;
         })
     ),
 

@@ -1,4 +1,3 @@
-
 import "./App.css";
 
 import { Suspense, lazy } from "react";
@@ -8,6 +7,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SuspenseLoader from "./components/common/SuspenseLoader";
 import About from "./pages/About";
 import AppLayout from "./components/layout/AppLayout";
+import { Toaster } from "sonner";
 
 const Products = lazy(() => import("./pages/products"));
 const Login = lazy(() => import("./pages/Login"));
@@ -18,6 +18,11 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+      />
 
       <Suspense fallback={<SuspenseLoader />} >
         <Routes>
