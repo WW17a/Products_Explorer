@@ -12,6 +12,7 @@ import Pagination from "../components/pagination/Pagination";
 import ConfirmDialog from "../components/common/confirmDialog";
 import useDebounce from "../hooks/useDebounce";
 import { CATEGORIES } from "../constants/categories";
+import { useCart } from "../context/CartContext";
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -24,7 +25,7 @@ const Products = () => {
     const [sort, setSort] = useState("");
     const [page, setPage] = useState(1);
 
-    const [pagination, setPagination] = useState({ currentPage: 1,totalPages: 1,totalProducts: 0,limit: 8,});
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalProducts: 0, limit: 8, });
 
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -34,6 +35,7 @@ const Products = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const location = useLocation();
+    const { addToCart } = useCart();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -122,6 +124,17 @@ const Products = () => {
     };
 
 
+    const handleAddToCart = async (product) => {
+        try {
+            await addToCart(product._id, 1);
+
+            toast.success(`${product.title} added to cart`);
+        } catch (error) {
+            toast.error(error.message || "Failed to add product to cart");
+        }
+    };
+
+
     const confirmDeleteProduct = async () => {
         try {
             setIsSubmitting(true);
@@ -152,7 +165,6 @@ const Products = () => {
         return <p>Failed to load products: {error}</p>;
     }
 
-
     return (
         <main className="mx-auto max-w-9xl px-2 py-5 sm:px-6 lg:px-8">
             <ProductToolbar
@@ -172,6 +184,8 @@ const Products = () => {
                     onSelect={handleSelect}
                     onEdit={handleEditProduct}
                     onDelete={handleDeleteProduct}
+                    onAddToCart={handleAddToCart}
+
                 />
             ) : (
                 <div className="py-16 text-center">

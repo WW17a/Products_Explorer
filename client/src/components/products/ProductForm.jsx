@@ -110,7 +110,6 @@ const ProductForm = ({ product, onSubmit, onClose, isSubmitting }) => {
                             </FormField>
                         </div>
 
-                        {/* Image Upload */}
                         <div className="mt-5">
                             <label htmlFor="image" className="mb-1 block text-sm font-medium text-gray-700">
                                 Product Image

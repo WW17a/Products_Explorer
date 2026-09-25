@@ -1,40 +1,40 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import apiClient from "./apiClient";
+const API_URL = `${import.meta.env.VITE_API_URL}/products`;
+
 const getErrorMessage = async (response, fallbackMessage) => {
     try {
         const data = await response.json();
-
         return data.message || fallbackMessage;
     } catch {
         return fallbackMessage;
     }
 };
 
-export const getProducts = async ({ search = "", category = "", sort = "", page = 1, limit = 8,
-} = {}) => {
+export const getProducts = async ({ search = "", category = "", sort = "", page = 1, limit = 8 } = {}) => {
     const params = new URLSearchParams();
 
-    if (search) params.append("search", search)
-    if (category) params.append("category", category)
+    if (search) params.append("search", search);
+    if (category) params.append("category", category);
 
     if (sort) {
         const [sortBy, order] = sort.split("-");
         params.append("sortBy", sortBy);
         params.append("order", order);
     }
+
     params.append("page", page);
     params.append("limit", limit);
-    const queryString = params.toString();
-    const url = `${API_URL}?${queryString}`;
 
-    console.log("this is final url being called towards server", url)
-    const response = await fetch(url);
+    const url = `${API_URL}?${params.toString()}`;
+
+    const response = await apiClient(url);
 
     if (!response.ok) {
         const message = await getErrorMessage(response, "Failed to fetch products");
         throw new Error(message);
     }
-    const data = await response.json();
-    return data;
+
+    return response.json();
 };
 
 export const createProduct = async (productData) => {
@@ -48,23 +48,17 @@ export const createProduct = async (productData) => {
     formData.append("stock", productData.stock);
     formData.append("image", productData.image);
 
-    const response = await fetch(API_URL, {
+    const response = await apiClient(API_URL, {
         method: "POST",
         body: formData,
     });
 
     if (!response.ok) {
-        const message = await getErrorMessage(
-            response,
-            "Failed to create product"
-        );
-
+        const message = await getErrorMessage(response, "Failed to create product");
         throw new Error(message);
     }
 
-    const data = await response.json();
-
-    return data;
+    return response.json();
 };
 
 export const updateProduct = async (productId, productData) => {
@@ -81,41 +75,28 @@ export const updateProduct = async (productId, productData) => {
         formData.append("image", productData.image);
     }
 
-    const response = await fetch(`${API_URL}/${productId}`, {
+    const response = await apiClient(`${API_URL}/${productId}`, {
         method: "PUT",
         body: formData,
     });
 
     if (!response.ok) {
-        const message = await getErrorMessage(
-            response,
-            "Failed to update product"
-        );
-
+        const message = await getErrorMessage(response, "Failed to update product");
         throw new Error(message);
     }
 
-    const data = await response.json();
-
-    return data;
+    return response.json();
 };
 
-
 export const deleteProduct = async (productId) => {
-    const response = await fetch(`${API_URL}/${productId}`, {
+    const response = await apiClient(`${API_URL}/${productId}`, {
         method: "DELETE",
     });
 
     if (!response.ok) {
-        const message = await getErrorMessage(
-            response,
-            "Failed to delete product"
-        );
-
+        const message = await getErrorMessage(response, "Failed to delete product");
         throw new Error(message);
     }
 
-    const data = await response.json();
-
-    return data;
+    return response.json();
 };

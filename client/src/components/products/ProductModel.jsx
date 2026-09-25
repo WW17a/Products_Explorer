@@ -24,7 +24,6 @@ const ProductModal = ({ product, onClose }) => {
           </p>
         </div>
 
-        {/* Fixed Footer so the button is always visible */}
         <div className="border-t border-gray-100 bg-gray-50 p-4">
           <button
             onClick={onClose}
