@@ -1,7 +1,7 @@
-
 import { useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import CartList from "../components/cart/CartList";
+import CartSummary from "../components/cart/CartSummary";
 
 const Cart = () => {
     const { cart, isLoading, error, fetchCart } = useCart();
@@ -11,7 +11,7 @@ const Cart = () => {
     }, []);
 
     if (isLoading && cart.items.length === 0) {
-        console.log("here is the loading state became correct ")
+        console.log("here is the loading state became correct ");
         return <p className="p-6 text-center">Loading cart...</p>;
     }
 
@@ -30,7 +30,15 @@ const Cart = () => {
             </div>
 
             {cart.items.length > 0 ? (
-                <CartList items={cart.items} />
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
+                    <div className="w-full lg:flex-1">
+                        <CartList items={cart.items} />
+                    </div>
+
+                    <div className="w-full lg:w-[320px] lg:shrink-0">
+                        <CartSummary items={cart.items} />
+                    </div>
+                </div>
             ) : (
                 <div className="rounded-lg border border-gray-200 bg-white p-10 text-center">
                     <h2 className="text-lg font-semibold text-gray-700">

@@ -40,11 +40,12 @@ export const signin = async ({ email, password }) => {
         throw new AppError("Invalid email or password", 401);
     }
 
-    const token = generateToken(user._id.toString());
+    const token = generateToken(user._id.toString(),user.role);
 
     return {
         id: user._id,
         name: user.username,
+        role:user.role,
         token,
     };
 };

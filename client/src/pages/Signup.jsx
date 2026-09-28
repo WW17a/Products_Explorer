@@ -12,14 +12,10 @@ const Signup = () => {
         try {
             setServerError("");
 
-            await signup({
-                name: values.name,
-                email: values.email,
-                password: values.password,
-            });
+            await signup(values);
             navigate("/login");
         } catch (error) {
-            setServerError(  error.response?.data?.message || "Signup failed");
+            setServerError(error.response?.data?.message || "Signup failed");
         } finally {
             setSubmitting(false);
         }
@@ -47,6 +43,6 @@ const Signup = () => {
             </p>
         </div>
     );
-};
+};  
 
 export default Signup;

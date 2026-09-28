@@ -4,13 +4,13 @@ import * as Yup from "yup"
 const SignUpForm = ({ onSubmit, serverError }) => {
     const formik = useFormik({
         initialValues: {
-            name: "",
+            username: "",
             email: "",
             password: "",
         },
 
         validationSchema: Yup.object({
-            name: Yup.string()
+            username: Yup.string()
                 .min(2, "Name must be at least 2 characters")
                 .required("Name is required"),
 
@@ -30,21 +30,21 @@ const SignUpForm = ({ onSubmit, serverError }) => {
         <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div>
                 <label className="mb-1 block">
-                    Name
+                    Username
                 </label>
 
                 <input
                     type="text"
-                    name="name"
-                    value={formik.values.name}
+                    name="username"
+                    value={formik.values.username}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     className="w-full rounded border p-2"
                 />
 
-                {formik.touched.name && formik.errors.name && (
+                {formik.touched.username && formik.errors.username && (
                     <p className="text-sm text-red-500">
-                        {formik.errors.name}
+                        {formik.errors.username}
                     </p>
                 )}
             </div>

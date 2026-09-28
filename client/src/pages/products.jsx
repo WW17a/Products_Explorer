@@ -13,6 +13,7 @@ import ConfirmDialog from "../components/common/confirmDialog";
 import useDebounce from "../hooks/useDebounce";
 import { CATEGORIES } from "../constants/categories";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -36,6 +37,8 @@ const Products = () => {
 
     const location = useLocation();
     const { addToCart } = useCart();
+    const {user} = useAuth();
+    const isAdmin = user?.role === "admin"
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -176,6 +179,7 @@ const Products = () => {
                 onSortChange={setSort}
                 categories={CATEGORIES}
                 onAddProduct={() => setIsProductFormOpen(true)}
+                isAdmin={isAdmin}
             />
 
             {products.length > 0 ? (
@@ -185,6 +189,7 @@ const Products = () => {
                     onEdit={handleEditProduct}
                     onDelete={handleDeleteProduct}
                     onAddToCart={handleAddToCart}
+                    isAdmin={isAdmin}
 
                 />
             ) : (

@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard";
 
-const ProductList = ({ onDelete, products, onSelect, onEdit, onAddToCart }) => {
+const ProductList = ({ onDelete, products, onSelect, onEdit, onAddToCart ,isAdmin}) => {
   return (
 
     <div className="flex flex-wrap gap-5 p-5 ">
@@ -13,6 +13,7 @@ const ProductList = ({ onDelete, products, onSelect, onEdit, onAddToCart }) => {
           onEdit={onEdit}
           onDelete={onDelete}
           onAddToCart={onAddToCart}
+          isAdmin={isAdmin}
         />
       ))}
     </div>

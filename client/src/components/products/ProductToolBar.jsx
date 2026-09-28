@@ -11,6 +11,7 @@ const ProductToolbar = ({
     onSortChange,
     categories,
     onAddProduct,
+    isAdmin
 }) => {
     return (
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -55,14 +56,15 @@ const ProductToolbar = ({
                     ))}
                 </select>
 
-
-                <button
-                    type="button"
-                    onClick={onAddProduct}
-                    className="whitespace-nowrap rounded-lg bg-[#172554] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                >
-                    + Add Product
-                </button>
+                {isAdmin &&
+                    <button
+                        type="button"
+                        onClick={onAddProduct}
+                        className="whitespace-nowrap rounded-lg bg-[#172554] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                    >
+                        + Add Product
+                    </button>
+                }
 
 
             </div>
