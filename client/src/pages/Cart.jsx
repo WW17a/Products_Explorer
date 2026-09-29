@@ -33,7 +33,7 @@ const Cart = () => {
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
                     <div className="w-full lg:flex-1">
                         <CartList items={cart.items} />
-                    </div>
+                    </div>  
 
                     <div className="w-full lg:w-[320px] lg:shrink-0">
                         <CartSummary items={cart.items} />

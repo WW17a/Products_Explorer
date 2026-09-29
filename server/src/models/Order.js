@@ -103,6 +103,13 @@ const orderSchema = new mongoose.Schema(
             min: 0,
         },
 
+        currency: {
+            type: String,
+            required: true,
+            default: "USD",
+            uppercase: true,
+        },
+
         status: {
             type: String,
             enum: ["pending", "confirmed", "cancelled"],
