@@ -30,6 +30,18 @@ const paymentSchema = new mongoose.Schema(
             sparse: true,
             index: true,
         },
+        approveUrl: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+
+        providerPaymentId: {
+            type: String,
+            default: null,
+            trim: true,
+            index: true,
+        },
 
         amount: {
             type: Number,
@@ -49,7 +61,7 @@ const paymentSchema = new mongoose.Schema(
             enum: [
                 "pending",
                 "processing",
-                "completed",
+                "paid",
                 "failed",
                 "unknown",
                 "refunded",

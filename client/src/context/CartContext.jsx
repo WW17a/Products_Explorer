@@ -72,8 +72,13 @@ export const CartProvider = ({ children }) => {
         } catch (error) {
             setError(error.message);
             throw error;
-        }finally { setIsLoading(false); }
+        } finally { setIsLoading(false); }
     };
+
+    const clearCart = () => {
+        setCart({ items: [] });
+    };
+
 
     return (
         <CartContext.Provider
@@ -86,6 +91,7 @@ export const CartProvider = ({ children }) => {
                 fetchCart,
                 updateCartItem: handleUpdateCartItem,
                 removeFromCart: handleRemoveFromCart,
+                clearCart
             }}
         >
             {children}

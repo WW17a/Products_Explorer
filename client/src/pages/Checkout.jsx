@@ -1,19 +1,23 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Formik, Form } from "formik";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import { createOrder } from "../services/orderApi";
+import { createPayment } from "../services/paymentApi";
 import checkoutSchema from "../validation/checkoutSchema";
 import CheckoutForm from "../components/checkout/CheckoutForm";
 import CheckoutItems from "../components/checkout/CheckoutItems";
 import CheckoutSummary from "../components/checkout/CheckoutSummary";
+import PayPalPayment from "../components/checkout/PaypalPayment";
 
 const SHIPPING_COST = 10;
 
 const Checkout = () => {
     const navigate = useNavigate();
-    const { cart } = useCart();
+    const { cart ,clearCart} = useCart();
+    const [payment, setPayment] = useState(null);
+    const [orderId, setOrderId] = useState(null);
 
     const subtotal = useMemo(
         () => cart.items.reduce((total, item) => total + item.product.price * item.quantity, 0),
@@ -48,15 +52,18 @@ const Checkout = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const data = await createOrder(values);
+            const orderData = await createOrder(values);
+            setOrderId(orderData._id)
+
+            const paymentData = await createPayment(orderData.order._id);
+
+            console.log("Payment response:", paymentData);
+
+            setPayment(paymentData.payment);
 
             toast.success("Order created successfully");
-
-            console.log("Created order:", data.order);
-
-            // Payment integration will start here.
         } catch (error) {
-            toast.error(error.message || "Failed to create order");
+            toast.error(error.message || "Failed to create payment");
         } finally {
             setSubmitting(false);
         }
@@ -73,7 +80,13 @@ const Checkout = () => {
             </div>
 
             <Formik
-                initialValues={{fullName: "",phone: "",address: "",city: "",postalCode: ""}}
+                initialValues={{
+                    fullName: "",
+                    phone: "",
+                    address: "",
+                    city: "",
+                    postalCode: "",
+                }}
                 validationSchema={checkoutSchema}
                 onSubmit={handleSubmit}
             >
@@ -85,13 +98,24 @@ const Checkout = () => {
                         </div>
 
                         <div className="lg:w-[360px]">
-                            <CheckoutSummary
-                                subtotal={subtotal}
-                                shipping={SHIPPING_COST}
-                                total={total}
-                                isSubmitting={isSubmitting}
-                                onBack={() => navigate("/cart")}
-                            />
+                            {payment ? (
+                                <PayPalPayment
+                                    payment={payment}
+                                    onSuccess={(capturedPayment) => {
+                                        clearCart();
+                                        toast.success("Payment completed successfully");
+                                        navigate(`/payment-success/${orderId}`);
+                                    }}
+                                />
+                            ) : (
+                                <CheckoutSummary
+                                    subtotal={subtotal}
+                                    shipping={SHIPPING_COST}
+                                    total={total}
+                                    isSubmitting={isSubmitting}
+                                    onBack={() => navigate("/cart")}
+                                />
+                            )}
                         </div>
                     </Form>
                 )}

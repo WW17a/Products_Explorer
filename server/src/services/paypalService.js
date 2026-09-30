@@ -1,9 +1,7 @@
 const PAYPAL_BASE_URL = process.env.PAYPAL_BASE_URL;
 
 export const getPayPalAccessToken = async () => {
-    const credentials = Buffer.from(
-        `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-    ).toString("base64");
+    const credentials = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString("base64");
 
     const response = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
         method: "POST",
@@ -57,24 +55,30 @@ export const createPayPalOrder = async ({ amount, currency, requestId }) => {
 
 
 export const capturePayPalOrder = async ({ paypalOrderId, requestId }) => {
-  const accessToken = await getPayPalAccessToken();
+    const accessToken = await getPayPalAccessToken();
 
-  const response = await fetch(
-    `${PAYPAL_BASE_URL}/v2/checkout/orders/${paypalOrderId}/capture`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        "PayPal-Request-Id": requestId,
-      },
+    const response = await fetch(
+        `${PAYPAL_BASE_URL}/v2/checkout/orders/${paypalOrderId}/capture`,
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "PayPal-Request-Id": requestId,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    console.log("PayPal capture status:", response.status);
+    console.log("PayPal capture response:", data);
+
+    if (!response.ok) {
+        throw new Error(
+            `PayPal order capture failed: ${data.message || "Unknown error"}`
+        );
     }
-  );
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`PayPal order capture failed: ${error}`);
-  }
-
-  return response.json();
+    return data;
 };
